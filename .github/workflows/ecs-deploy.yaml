@@ -36,3 +36,18 @@ jobs:
             aws-access-key-id: ${{secrets.AWS_ACCESS_KEY}}
             aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
             aws-region: ${{secrets.AWS_REGION}}
+       # this step permits you to github actions to login to ecr
+        - name: login to ecr
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v1
+          ## containerise artifact with maven tag and push to ecr repo
+        - name: build, tag and push 
+          id: build-image
+          env:
+            REGISTRY: ${{steps.login-ecr.outputs.registry}}
+            REPOSITORY: ecs-deploy
+            IMAGE_TAG: ${{github.sha}} # context that specifies the commit id that triggered your workflow
+          run: |
+             docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+             docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+             echo "image=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >>GITHUB_OUTPUT
