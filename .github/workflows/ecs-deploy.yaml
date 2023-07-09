@@ -1,0 +1,36 @@
+name: deploy to ecs
+on:
+    push:
+        branches:
+            main
+    workflow_dispatch:
+
+jobs:
+   builddeploytoecs:
+      runs-on: ubuntu-latest
+      permissions :
+        contents: read
+        packages: write
+      steps:
+        - name: checkout clone from repo
+          uses: actions/checkout@v3
+        - name: set up java and maven
+          uses: actions/setup-java@v3
+          with:
+             distribution: 'adopt'
+             java-version: '11'
+
+        - name: package with maven
+          run: mvn package
+        - name: code analysis with sonarqube 
+          run:  mvn sonar:sonar -Dsonar.projectKey=xashywebapp -Dsonar.host.url=${{secrets.SONAR_HOST_URL}} -Dsonar.token=${{secrets.SONAR_LOGIN_TOKEN}}
+        - name: upload artifact to github packages
+          run: mvn --batch-mode deploy
+          env:
+            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+       
+        # - name: authenticate in aws env
+        #   run:
+        #     aws_access_key: 
+        #     aws_secret_access_key:
+        #     aws_regions:
