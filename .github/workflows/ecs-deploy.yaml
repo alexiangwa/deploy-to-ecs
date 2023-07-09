@@ -23,8 +23,8 @@ jobs:
         - name: package with maven
           run: mvn package
           #make sure u update the url withethe pub ip incase u stop and start your sonarqube server
-        - name: code analysis with sonarqube 
-          run:  mvn sonar:sonar -Dsonar.projectKey=xashywebapp -Dsonar.host.url=${{secrets.SONAR_HOST_URL}} -Dsonar.token=${{secrets.SONAR_LOGIN_TOKEN}}
+        # - name: code analysis with sonarqube 
+        #   run:  mvn sonar:sonar -Dsonar.projectKey=xashywebapp -Dsonar.host.url=${{secrets.SONAR_HOST_URL}} -Dsonar.token=${{secrets.SONAR_LOGIN_TOKEN}}
         - name: upload artifact to github packages
           run: mvn --batch-mode deploy
           env:
